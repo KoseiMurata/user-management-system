@@ -1,6 +1,5 @@
 // components/RegisterForm.tsx
 
-import React, { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { TextField, Button, Box, Typography, Alert } from "@mui/material";
 import { createUser } from "../utils/api";
@@ -52,7 +51,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   return (
     <Box sx={{ maxWidth: 400, mx: "auto", mt: 4 }}>
       <Typography variant="h5" gutterBottom>
-        新規登録
+        新規ユーザー登録
       </Typography>
 
       <form onSubmit={handleSubmit(onSubmit)}>
