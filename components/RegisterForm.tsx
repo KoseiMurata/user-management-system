@@ -50,10 +50,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
 
   return (
     <Box sx={{ maxWidth: 400, mx: "auto", mt: 4 }}>
-      <Typography variant="h5" gutterBottom>
-        新規ユーザー登録
-      </Typography>
-
       <form onSubmit={handleSubmit(onSubmit)}>
         <TextField
           label="名前"

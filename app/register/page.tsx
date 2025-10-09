@@ -1,11 +1,11 @@
 // app/register/page.tsx
 
-'use client'; // クライアントコンポーネントとしてマーク
+"use client"; // クライアントコンポーネントとしてマーク
 
-import React from 'react';
-import RegisterForm from '../../components/RegisterForm';
-import { Typography } from '@mui/material';
-import { useRouter } from 'next/navigation';
+import React from "react";
+import RegisterForm from "../../components/RegisterForm";
+import { Box, Typography } from "@mui/material";
+import { useRouter } from "next/navigation";
 
 // TODO: 新規登録ページを実装し、RegisterFormコンポーネントを使用する
 const RegisterPage: React.FC = () => {
@@ -13,12 +13,15 @@ const RegisterPage: React.FC = () => {
 
   const handleSuccess = () => {
     router.push("/users");
-  }
+  };
   return (
-    <Typography>
-        <RegisterForm onSuccess={handleSuccess} />
-    </Typography>
+    <Box sx={{ mt: 4 }}>
+      <Typography variant="h4" gutterBottom>
+        新規ユーザー登録
+      </Typography>
+      <RegisterForm onSuccess={handleSuccess} />
+    </Box>
   );
-}
+};
 
 export default RegisterPage;

@@ -4,12 +4,7 @@
 
 import React, { useEffect } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
-import {
-  TextField,
-  Button,
-  Box,
-  Typography,
-} from "@mui/material";
+import { TextField, Button, Box, Typography } from "@mui/material";
 import { fetchUserById, updateUser } from "../utils/api";
 
 interface EditUserFormInputs {
@@ -66,9 +61,6 @@ const EditUserForm: React.FC<EditUserFormProps> = ({
 
   return (
     <Box sx={{ maxWidth: 400, mx: "auto", mt: 4 }}>
-      <Typography variant="h5" gutterBottom>
-        ユーザー編集
-      </Typography>
       <form onSubmit={handleSubmit(onSubmit)}>
         <TextField
           label="名前"
