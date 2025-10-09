@@ -76,6 +76,7 @@ const EditUserForm: React.FC<EditUserFormProps> = ({
           margin="normal"
           {...register("name", { required: "名前は必須です" })}
           disabled={disabled}
+          InputLabelProps={{ shrink: true }}
         />
         <TextField
           label="メールアドレス"
@@ -90,6 +91,7 @@ const EditUserForm: React.FC<EditUserFormProps> = ({
             },
           })}
           disabled={disabled}
+          InputLabelProps={{ shrink: true }}
         />
         <TextField
           label="役職"
@@ -97,6 +99,7 @@ const EditUserForm: React.FC<EditUserFormProps> = ({
           margin="normal"
           {...register("role", { required: "役職は必須です" })}
           disabled={disabled}
+          InputLabelProps={{ shrink: true }}
         />
         <Button
           type="submit"
