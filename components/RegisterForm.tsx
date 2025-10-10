@@ -1,7 +1,7 @@
 // components/RegisterForm.tsx
 
 import { useForm, SubmitHandler } from "react-hook-form";
-import { TextField, Button, Box, Typography, Alert } from "@mui/material";
+import { TextField, Button, Box } from "@mui/material";
 import { createUser } from "../utils/api";
 
 // 必要に応じて利用する
@@ -28,7 +28,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<RegisterFormInputs>();
+  } = useForm<RegisterFormInputs>({ criteriaMode: "all" });
 
   const onSubmit: SubmitHandler<RegisterFormInputs> = async (data) => {
     try {
@@ -55,7 +55,29 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           label="名前"
           fullWidth
           margin="normal"
-          {...register("name", { required: "名前は必須です" })}
+          {...register("name", {
+            required: "名前は必須です",
+            minLength: {
+              value: 2,
+              message: "名前は2文字以上で入力してください",
+            },
+            maxLength: {
+              value: 8,
+              message: "名前は8文字以内で入力してください",
+            },
+            pattern: {
+              value: /^[A-Za-z0-9ぁ-んァ-ヶー一-龠]+$/,
+              message: "名前に記号は使用できません",
+            },
+          })}
+          error={!!errors.name}
+          helperText={
+            errors.name?.types
+              ? Object.values(errors.name.types).map((msg, i) => (
+                  <div key={i}>{msg}</div>
+                ))
+              : errors.name?.message
+          }
           disabled={disabled}
         />
         <TextField
@@ -66,17 +88,43 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           {...register("email", {
             required: "メールアドレスは必須です",
             pattern: {
-              value: /^[^@\s]+@[^@\s]+\.[^@\s]+$/,
-              message: "有効なメールアドレスを入力してください",
+              value: /^[A-Za-z0-9._%+-]+@(gmail\.com|fox-hound\.co\.jp)$/,
+              message:
+                "使用できるドメインは gmail.com または fox-hound.co.jp のみです",
             },
           })}
+          error={!!errors.email}
+          helperText={
+            errors.email?.types
+              ? Object.values(errors.email.types).map((msg, i) => (
+                  <div key={i}>{msg}</div>
+                ))
+              : errors.email?.message
+          }
           disabled={disabled}
         />
         <TextField
           label="役職"
           fullWidth
           margin="normal"
-          {...register("role", { required: "役職は必須です" })}
+          {...register("role", {
+            required: "役職は必須です",
+            validate: (value) => {
+              const allowedRoles = ["admin", "guest", "一般ユーザー"];
+              return (
+                allowedRoles.includes(value) ||
+                "役割は admin, guest, 一般ユーザー のいずれかを入力してください"
+              );
+            },
+          })}
+          error={!!errors.role}
+          helperText={
+            errors.role?.types
+              ? Object.values(errors.role.types).map((msg, i) => (
+                  <div key={i}>{msg}</div>
+                ))
+              : errors.role?.message
+          }
           disabled={disabled}
         />
         <Button
