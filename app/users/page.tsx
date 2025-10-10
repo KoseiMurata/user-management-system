@@ -1,16 +1,14 @@
+// app/users/page.tsx
 "use client";
-
+import UserList from "@/components/UserList";
 import { Alert, Box, CircularProgress, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import UserCard from "../../components/UserCard";
 import { User } from "../../types/User";
 import { fetchUsers } from "../../utils/api";
-
 const UsersPage: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
   useEffect(() => {
     const getUsers = async () => {
       try {
@@ -23,28 +21,21 @@ const UsersPage: React.FC = () => {
         setLoading(false);
       }
     };
-
     getUsers();
   }, []);
-
   if (loading) {
     return <CircularProgress />;
   }
-
   if (error) {
     return <Alert severity="error">{error}</Alert>;
   }
-
   return (
     <Box>
       <Typography variant="h4" gutterBottom>
         ユーザー一覧
       </Typography>
-      {users.map((user) => (
-        <UserCard key={user.id} user={user} />
-      ))}
+      <UserList initialUsers={users} />
     </Box>
   );
 };
-
 export default UsersPage;

@@ -1,19 +1,18 @@
-import React from "react";
+import React, { useState } from "react";
 import { User } from "../types/User";
 import UserCard from "./UserCard";
 import { Box, Typography } from "@mui/material";
 
 interface UserListProps {
-  users: User[];
+  initialUsers: User[];
 }
 
-const UserList: React.FC<UserListProps> = ({ users }) => {
+const UserList: React.FC<UserListProps> = ({ initialUsers }) => {
+  const [filterUsers, setFilterUsers] = useState<User[]>(initialUsers);
+
   return (
    <Box>
-      <Typography variant="h4" gutterBottom>
-        ユーザー一覧
-      </Typography>
-      {users.map((user) => (
+      {filterUsers.map((user) => (
         <UserCard key={user.id} user={user} />
       ))}
     </Box>
