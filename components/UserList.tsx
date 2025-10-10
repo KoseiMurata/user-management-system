@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { User } from "../types/User";
 import UserCard from "./UserCard";
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 
 interface UserListProps {
   initialUsers: User[];
@@ -10,10 +10,14 @@ interface UserListProps {
 const UserList: React.FC<UserListProps> = ({ initialUsers }) => {
   const [filterUsers, setFilterUsers] = useState<User[]>(initialUsers);
 
+  const handleDelete = (deletedUserId: number) => {
+    setFilterUsers((e) => e.filter((user) => user.id !== deletedUserId && !user.deleted));
+  };
+
   return (
-   <Box>
+    <Box>
       {filterUsers.map((user) => (
-        <UserCard key={user.id} user={user} />
+        <UserCard key={user.id} user={user} onDelete={handleDelete} />
       ))}
     </Box>
   );
