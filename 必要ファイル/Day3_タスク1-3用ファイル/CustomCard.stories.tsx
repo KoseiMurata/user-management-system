@@ -2,7 +2,7 @@
 
 import type { Meta, StoryObj } from "@storybook/react";
 import CustomCard from "./CustomCard";
-import CustomButton from "./CustomButton";
+import CustomButton from "../../components/parts/CustomButton";
 
 // TODO: メタデータ
 // TODO: ストーリーの定義

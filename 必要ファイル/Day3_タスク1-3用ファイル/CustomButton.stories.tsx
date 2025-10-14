@@ -1,7 +1,7 @@
 // components/parts/CustomButton.stories.tsx
 
 import type { Meta, StoryObj } from "@storybook/react";
-import CustomButton from "./CustomButton";
+import CustomButton from "../../components/parts/CustomButton";
 
 const meta: Meta<typeof CustomButton> = {
   title: "Components/Parts/CustomButton",
