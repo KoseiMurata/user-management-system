@@ -1,7 +1,7 @@
 // components/parts/CustomCard.stories.tsx
 
 import type { Meta, StoryObj } from "@storybook/react";
-import CustomCard from "./CustomCard";
+import CustomCard from "../../components/parts/CustomCard";
 import CustomButton from "../../components/parts/CustomButton";
 
 // TODO: メタデータ
