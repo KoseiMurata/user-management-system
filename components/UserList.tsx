@@ -5,6 +5,7 @@ import CustomCard from "./parts/CustomCard";
 import CustomButton from "./parts/CustomButton";
 import Link from "next/link";
 import { softDeleteUser } from "@/utils/api";
+import CustomModal from "./parts/CustomModal";
 
 interface UserListProps {
   initialUsers: User[];
@@ -12,17 +13,25 @@ interface UserListProps {
 
 const UserList: React.FC<UserListProps> = ({ initialUsers }) => {
   const [filterUsers, setFilterUsers] = useState<User[]>(initialUsers);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 
   const handleDelete = async (deletedUserId: number) => {
-    if (confirm("本当にこのユーザーを削除しますか？")) {
-      try {
-        await softDeleteUser(deletedUserId);
-        setFilterUsers((prev) =>
-          prev.filter((user) => user.id !== deletedUserId && !user.deleted)
-        );
-      } catch (error) {
-        console.error("削除に失敗しました", error);
-      }
+    try {
+      await softDeleteUser(deletedUserId);
+      setFilterUsers((prev) =>
+        prev.filter((user) => user.id !== deletedUserId && !user.deleted)
+      );
+    } catch (error) {
+      console.error("削除に失敗しました", error);
+    }
+  };
+
+  const handleConfirm = () => {
+    if (selectedUserId !== null) {
+      handleDelete(selectedUserId);
+      setIsModalOpen(false);
+      setSelectedUserId(null);
     }
   };
 
@@ -59,7 +68,10 @@ const UserList: React.FC<UserListProps> = ({ initialUsers }) => {
               <CustomButton
                 variantType="danger"
                 size="small"
-                onClick={() => handleDelete(user.id)}
+                onClick={() => {
+                  setSelectedUserId(user.id);
+                  setIsModalOpen(true);
+                }}
               >
                 削除
               </CustomButton>
@@ -67,6 +79,17 @@ const UserList: React.FC<UserListProps> = ({ initialUsers }) => {
           }
         />
       ))}
+
+      <CustomModal
+        open={isModalOpen}
+        title="ユーザー削除確認"
+        content="本当にこのユーザーを削除しますか？"
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedUserId(null);
+        }}
+        onConfirm={handleConfirm}
+      />
     </Box>
   );
 };
