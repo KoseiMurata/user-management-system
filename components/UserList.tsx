@@ -1,6 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { User } from "../types/User";
-import { Box, Typography } from "@mui/material";
+import {
+  Box,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Typography,
+} from "@mui/material";
 import CustomCard from "./parts/CustomCard";
 import CustomButton from "./parts/CustomButton";
 import Link from "next/link";
@@ -15,6 +22,29 @@ const UserList: React.FC<UserListProps> = ({ initialUsers }) => {
   const [filterUsers, setFilterUsers] = useState<User[]>(initialUsers);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+  const [selectedId, setSelectedId] = useState<string>("");
+  const [selectedRole, setSelectedRole] = useState<string>("");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+
+  const uniqueIds = Array.from(
+    new Set(initialUsers.map((user) => user.id.toString()))
+  );
+  const uniqueRoles = Array.from(
+    new Set(initialUsers.map((user) => user.role))
+  );
+  useEffect(() => {
+    let filtered = initialUsers;
+
+    if (selectedId) {
+      filtered = filtered.filter((user) => user.id.toString() === selectedId);
+    }
+
+    if (selectedRole) {
+      filtered = filtered.filter((user) => user.role === selectedRole);
+    }
+    filtered.sort((a, b) => (sortOrder === "asc" ? a.id - b.id : b.id - a.id));
+    setFilterUsers(filtered);
+  }, [selectedId, selectedRole, initialUsers, sortOrder]);
 
   const handleDelete = async (deletedUserId: number) => {
     try {
@@ -37,6 +67,49 @@ const UserList: React.FC<UserListProps> = ({ initialUsers }) => {
 
   return (
     <Box>
+      <Box display="flex" gap={2} mb={3}>
+        <FormControl size="small" sx={{ minWidth: 120 }}>
+          <InputLabel>ID</InputLabel>
+          <Select
+            value={selectedId}
+            label="ID"
+            onChange={(e) => setSelectedId(e.target.value)}
+          >
+            <MenuItem value="">all</MenuItem>
+            {uniqueIds.map((id) => (
+              <MenuItem key={id} value={id}>
+                {id}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <FormControl size="small" sx={{ minWidth: 150 }}>
+          <InputLabel>役職</InputLabel>
+          <Select
+            value={selectedRole}
+            label="役職"
+            onChange={(e) => setSelectedRole(e.target.value)}
+          >
+            <MenuItem value="">all</MenuItem>
+            {uniqueRoles.map((role) => (
+              <MenuItem key={role} value={role}>
+                {role}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <FormControl size="small" sx={{ minWidth: 150 }}>
+          <InputLabel>並び替え</InputLabel>
+          <Select
+            value={sortOrder}
+            label="並び替え"
+            onChange={(e) => setSortOrder(e.target.value as "asc" | "desc")}
+          >
+            <MenuItem value="asc">ID昇順</MenuItem>
+            <MenuItem value="desc">ID降順</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
       {filterUsers.map((user) => (
         <CustomCard
           key={user.id}
