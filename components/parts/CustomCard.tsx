@@ -21,10 +21,10 @@ const CustomCard: React.FC<CustomCardProps> = ({
         {/*
 		      TODO: [titel]と[description]を表示
 		     */}
-         <Typography>
+         <Typography variant="h5" component="div">
           {title}
          </Typography>
-         <Typography>
+         <Typography variant="body2">
           {description}
          </Typography>
       </CardContent>
