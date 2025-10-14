@@ -8,7 +8,8 @@ import {
 import Link from "next/link";
 import React from "react";
 import { User } from "../types/User";
-import DeleteUserButton from "./DeleteUserBotton";
+import CustomButton from "./parts/CustomButton";
+import { softDeleteUser } from "@/utils/api";
 
 interface UserCardProps {
   user: User;
@@ -16,6 +17,18 @@ interface UserCardProps {
 }
 
 const UserCard: React.FC<UserCardProps> = ({ user, onDelete }) => {
+
+  const handleDelete = async () => {
+    if (confirm("本当にこのユーザーを削除しますか？")) {
+      try {
+        await softDeleteUser(user.id);
+        onDelete(user.id);
+      } catch (error) {
+        error;
+      }
+    }
+  };
+
   return (
     <Card sx={{ minWidth: 275, mb: 2 }}>
       <CardContent>
@@ -36,7 +49,9 @@ const UserCard: React.FC<UserCardProps> = ({ user, onDelete }) => {
         <Button size="small" component={Link} href={`/users/${user.id}/edit`}>
           編集
         </Button>
-        <DeleteUserButton userId={user.id} onDelete={onDelete} />
+        <CustomButton variantType="danger" size="small" onClick={handleDelete}>
+          削除
+        </CustomButton>
       </CardActions>
     </Card>
   );
