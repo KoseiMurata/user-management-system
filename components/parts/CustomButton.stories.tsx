@@ -2,6 +2,7 @@
 
 import type { Meta, StoryObj } from "@storybook/react";
 import CustomButton from "./CustomButton";
+import { Save, Delete, Edit } from "@mui/icons-material";
 
 const meta: Meta<typeof CustomButton> = {
   title: "Components/Parts/CustomButton",
@@ -9,20 +10,16 @@ const meta: Meta<typeof CustomButton> = {
   tags: ["autodocs"],
 };
 
-// TODO: メタデータのエクスポート
 export default meta;
-
-// TODO: ストーリーの定義
 type Story = StoryObj<typeof CustomButton>;
 
+// --- 基本ボタン ---
 export const Primary: Story = {
   args: {
     variantType: "primary",
     children: "Primary Button",
   },
 };
-
-// TODO: 上記サンプルを参考に[Secondary][Danger]を設定する
 
 export const Secondary: Story = {
   args: {
@@ -38,3 +35,35 @@ export const Danger: Story = {
   },
 };
 
+// --- アイコン付き ---
+export const WithIcon: Story = {
+  args: {
+    variantType: "primary",
+    children: "Save",
+    startIcon: <Save />,
+  },
+};
+
+export const WithEndIcon: Story = {
+  args: {
+    variantType: "secondary",
+    children: "Edit",
+    endIcon: <Edit />,
+  },
+};
+
+export const DeleteIconButton: Story = {
+  args: {
+    variantType: "danger",
+    children: "Delete",
+    startIcon: <Delete />,
+  },
+};
+
+export const Loading: Story = {
+  args: {
+    variantType: "primary",
+    children: "Loading...",
+    loading: true,
+  },
+};
