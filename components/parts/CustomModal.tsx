@@ -1,6 +1,6 @@
 // components/parts/CustomModal.tsx
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Modal,
   Box,
@@ -31,12 +31,16 @@ interface CustomModalProps {
   title: string;
   content?: string;
   onClose: () => void;
-  onConfirm?: () => void;
+  onConfirm?: (data?: { name: string; email: string; role: string }) => void;
   animationType?: "fade" | "slide" | "none";
   showForm?: boolean;
+  defaultValues?: {
+    name?: string;
+    email?: string;
+    role?: string;
+  };
 }
 
-// TODO: propの設定
 const CustomModal: React.FC<CustomModalProps> = ({
   open,
   title,
@@ -45,10 +49,18 @@ const CustomModal: React.FC<CustomModalProps> = ({
   onConfirm,
   animationType = "fade",
   showForm = false,
+  defaultValues = {},
 }) => {
   const theme = useTheme();
-  const [text, setText] = useState("");
-  const [checked, setChecked] = useState(false);
+  const [email, setEmail] = useState(defaultValues.email || "");
+  const [role, setRole] = useState(defaultValues.role || "");
+  const [name, setName] = useState(defaultValues.name || "");
+
+  useEffect(() => {
+    setName(defaultValues.name || "");
+    setEmail(defaultValues.email || "");
+    setRole(defaultValues.role || "");
+  }, [defaultValues]);
 
   const bgColor =
     theme.palette.mode === "dark"
@@ -67,18 +79,21 @@ const CustomModal: React.FC<CustomModalProps> = ({
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
           <TextField
             label="名前"
-            value={text}
-            onChange={(e) => setText(e.target.value)}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             fullWidth
           />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={checked}
-                onChange={(e) => setChecked(e.target.checked)}
-              />
-            }
-            label="同意します"
+          <TextField
+            label="メール"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            fullWidth
+          />
+          <TextField
+            label="役割"
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            fullWidth
           />
         </Box>
       ) : (
@@ -95,9 +110,10 @@ const CustomModal: React.FC<CustomModalProps> = ({
             color="primary"
             onClick={() => {
               if (showForm) {
-                alert(`入力値: ${text}\n同意: ${checked ? "はい" : "いいえ"}`);
+                onConfirm({ name, email, role });
+              } else {
+                onConfirm();
               }
-              onConfirm();
             }}
           >
             確認

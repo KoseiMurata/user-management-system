@@ -13,7 +13,6 @@ import {
 import { styled } from "@mui/material/styles";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
-// TODO: インターフェースを修正
 interface CustomCardProps {
   title: React.ReactNode;
   description: React.ReactNode;
@@ -44,14 +43,24 @@ const CustomCard: React.FC<CustomCardProps> = ({
   expandableDescription = false,
   expandedInitially = false,
 }) => {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(expandedInitially);
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
 
   return (
-    <Card sx={{ minWidth: 275, mb: 2, backgroundColor: bgColor }}>
+    <Card
+      sx={{
+        minWidth: 275,
+        mb: 2,
+        backgroundColor: bgColor,
+        "&:hover": {
+          transform: "scale(1.03)",
+          boxShadow: "0px 4px 20px rgba(0,0,0,0.15)",
+        },
+      }}
+    >
       {imageUrl && (
         <CardMedia
           component="img"
@@ -61,9 +70,6 @@ const CustomCard: React.FC<CustomCardProps> = ({
         />
       )}
       <CardContent>
-        {/*
-		      TODO: [titel]と[description]を表示
-		     */}
         <Typography variant="h5" component="div">
           {title}
         </Typography>

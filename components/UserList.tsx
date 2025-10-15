@@ -12,9 +12,9 @@ import {
 } from "@mui/material";
 import CustomCard from "./parts/CustomCard";
 import CustomButton from "./parts/CustomButton";
-import Link from "next/link";
 import { softDeleteUser } from "@/utils/api";
 import CustomModal from "./parts/CustomModal";
+import Link from "next/link";
 
 interface UserListProps {
   initialUsers: User[];
@@ -23,13 +23,24 @@ interface UserListProps {
 const UserList: React.FC<UserListProps> = ({ initialUsers }) => {
   const [filterUsers, setFilterUsers] = useState<User[]>(initialUsers);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+  const [modalType, setModalType] = useState<
+    "delete" | "detail" | "edit" | null
+  >(null);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  // 🔹検索・ソート状態
   const [selectedId, setSelectedId] = useState<string>("all");
   const [selectedRole, setSelectedRole] = useState<string>("all");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
-  const uniqueIds = Array.from(new Set(initialUsers.map((user) => user.id.toString())));
-  const uniqueRoles = Array.from(new Set(initialUsers.map((user) => user.role)));
+  // 🔹プルダウン用データ
+  const uniqueIds = Array.from(
+    new Set(initialUsers.map((user) => user.id.toString()))
+  );
+  const uniqueRoles = Array.from(
+    new Set(initialUsers.map((user) => user.role))
+  );
 
   useEffect(() => {
     let filtered = initialUsers;
@@ -46,23 +57,60 @@ const UserList: React.FC<UserListProps> = ({ initialUsers }) => {
     setFilterUsers(filtered);
   }, [selectedId, selectedRole, sortOrder, initialUsers]);
 
+  // 🔹編集結果反映
+  const handleUpdateUser = (updatedData: {
+    name: string;
+    email: string;
+    role: string;
+  }) => {
+    if (!selectedUser) return;
+    setFilterUsers((prev) =>
+      prev.map((u) => (u.id === selectedUser.id ? { ...u, ...updatedData } : u))
+    );
+  };
+
   const handleDelete = async (deletedUserId: number) => {
     try {
+      setLoading(true);
       await softDeleteUser(deletedUserId);
       setFilterUsers((prev) =>
         prev.filter((user) => user.id !== deletedUserId && !user.deleted)
       );
     } catch (error) {
       console.error("削除に失敗しました", error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleConfirm = () => {
-    if (selectedUserId !== null) {
-      handleDelete(selectedUserId);
-      setIsModalOpen(false);
-      setSelectedUserId(null);
+  // 🔹モーダル確定
+  const handleConfirm = (updatedData?: {
+    name: string;
+    email: string;
+    role: string;
+  }) => {
+    if (modalType === "delete" && selectedUser) {
+      handleDelete(selectedUser.id);
+    } else if (modalType === "edit" && updatedData) {
+      handleUpdateUser(updatedData);
     }
+    setIsModalOpen(false);
+    setSelectedUser(null);
+    setModalType(null);
+  };
+
+  // 🔹モーダルを開く
+  const openModal = (type: "delete" | "detail" | "edit", user: User) => {
+    setSelectedUser(user);
+    setModalType(type);
+    setIsModalOpen(true);
+  };
+
+  // 🔹モーダルを閉じる
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedUser(null);
+    setModalType(null);
   };
 
   return (
@@ -156,7 +204,7 @@ const UserList: React.FC<UserListProps> = ({ initialUsers }) => {
             title={user.name}
             description={
               <>
-                <Typography variant="body2">{user.email}</Typography>
+                <Typography variant="body2">メール: {user.email}</Typography>
                 <Typography variant="body2">役割: {user.role}</Typography>
               </>
             }
@@ -165,48 +213,78 @@ const UserList: React.FC<UserListProps> = ({ initialUsers }) => {
                 <CustomButton
                   variantType="primary"
                   size="small"
-                  component={Link}
-                  href={`/users/${user.id}/details`}
-                >
-                  詳細
-                </CustomButton>
+                  label="詳細"
+                  loading={isModalOpen}
+                  onClick={() => openModal("detail", user)}
+                />
+                <CustomButton
+                  variantType="secondary"
+                  size="small"
+                  label="モーダル"
+                  loading={isModalOpen}
+                  onClick={() => openModal("edit", user)}
+                />
+                <CustomButton
+                  variantType="danger"
+                  size="small"
+                  onClick={() => openModal("delete", user)}
+                  label="削除"
+                  loading={isModalOpen}
+                />
                 <CustomButton
                   variantType="secondary"
                   size="small"
                   component={Link}
                   href={`/users/${user.id}/edit`}
-                >
-                  編集
-                </CustomButton>
-                <CustomButton
-                  variantType="danger"
-                  size="small"
-                  onClick={() => {
-                    setSelectedUserId(user.id);
-                    setIsModalOpen(true);
-                  }}
-                >
-                  削除
-                </CustomButton>
+                  label="編集"
+                  loading={isModalOpen}
+                />
               </>
             }
+            expandableDescription={true}
+            bgColor={user.id % 2 === 0 ? "#f0f7ff" : "#f9f9f9"}
           />
         ))
       ) : (
-        <Typography color="text.secondary">該当するユーザーがいません。</Typography>
+        <Typography color="text.secondary">
+          該当するユーザーがいません。
+        </Typography>
       )}
 
       {/* モーダル */}
-      <CustomModal
-        open={isModalOpen}
-        title="ユーザー削除確認"
-        content="本当にこのユーザーを削除しますか？"
-        onClose={() => {
-          setIsModalOpen(false);
-          setSelectedUserId(null);
-        }}
-        onConfirm={handleConfirm}
-      />
+      {selectedUser && (
+        <CustomModal
+          key={selectedUser.id}
+          open={isModalOpen}
+          title={
+            modalType === "delete"
+              ? "ユーザー削除確認"
+              : modalType === "edit"
+              ? "ユーザー編集"
+              : "ユーザー詳細"
+          }
+          content={
+            modalType === "delete"
+              ? "本当にこのユーザーを削除しますか？"
+              : modalType === "detail"
+              ? `名前: ${selectedUser.name}\nメール: ${selectedUser.email}\n役職: ${selectedUser.role}`
+              : undefined
+          }
+          animationType="slide"
+          showForm={modalType === "edit"}
+          defaultValues={
+            modalType === "edit"
+              ? {
+                  name: selectedUser.name,
+                  email: selectedUser.email,
+                  role: selectedUser.role,
+                }
+              : undefined
+          }
+          onClose={closeModal}
+          onConfirm={handleConfirm}
+        />
+      )}
     </Box>
   );
 };
